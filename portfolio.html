@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Registrierung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+        }
+        input[type="text"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="authContainer">
+        <h2 id="authTitle">Login</h2>
+        <div id="authForm">
+            <input type="text" id="username" placeholder="Benutzername" required>
+            <input type="password" id="password" placeholder="Passwort" required>
+            <button onclick="login()">Einloggen</button>
+        </div>
+        <div id="registerForm" style="display: none;">
+            <input type="text" id="newUsername" placeholder="Benutzername" required>
+            <input type="password" id="newPassword" placeholder="Passwort" required>
+            <button onclick="register()">Registrieren</button>
+        </div>
+        <div class="message">
+            <button onclick="toggleRegisterLogin()">Registrieren</button>
+        </div>
+    </div>
+
+    <div class="container" id="dashboardContainer" style="display: none;">
+        <h2>Willkommen, <span id="userGreeting"></span></h2>
+        <input type="file" id="fileUpload" onchange="uploadFile()">
+        <p id="fileName"></p>
+        <button onclick="logout()">Abmelden</button>
+    </div>
+
+    <script>
+        // Wenn ein Benutzer eingeloggt ist, wird die Login- und Registrierungsseite versteckt
+        window.onload = function() {
+            if(localStorage.getItem("loggedIn") === "true") {
+                showDashboard();
+            }
+        }
+
+        // Funktion zum Einloggen
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if(username && password) {
+                if(localStorage.getItem(username) === password) {
+                    localStorage.setItem("loggedIn", "true");
+                    localStorage.setItem("currentUser", username);
+                    showDashboard();
+                } else {
+                    alert("Falscher Benutzername oder Passwort.");
+                }
+            }
+        }
+
+        // Funktion zur Registrierung
+        function register() {
+            const username = document.getElementById("newUsername").value;
+            const password = document.getElementById("newPassword").value;
+
+            if(username && password) {
+                if(localStorage.getItem(username)) {
+                    alert("Benutzername existiert bereits.");
+                } else {
+                    localStorage.setItem(username, password);
+                    alert("Registrierung erfolgreich! Jetzt einloggen.");
+                    toggleRegisterLogin();
+                }
+            }
+        }
+
+        // Dashboard anzeigen
+        function showDashboard() {
+            document.getElementById("authContainer").style.display = "none";
+            document.getElementById("dashboardContainer").style.display = "block";
+            document.getElementById("userGreeting").innerText = localStorage.getItem("currentUser");
+        }
+
+        // Ausloggen
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            localStorage.removeItem("currentUser");
+            document.getElementById("authContainer").style.display = "block";
+            document.getElementById("dashboardContainer").style.display = "none";
+        }
+
+        // Datei hochladen
+        function uploadFile() {
+            const fileInput = document.getElementById("fileUpload");
+            const file = fileInput.files[0];
+            if(file) {
+                document.getElementById("fileName").innerText = `Hochgeladene Datei: ${file.name}`;
+            }
+        }
+
+        // Wechseln zwischen Login und Registrierung
+        function toggleRegisterLogin() {
+            const authTitle = document.getElementById("authTitle");
+            const authForm = document.getElementById("authForm");
+            const registerForm = document.getElementById("registerForm");
+
+            if(authTitle.innerText === "Login") {
+                authTitle.innerText = "Registrierung";
+                authForm.style.display = "none";
+                registerForm.style.display = "block";
+            } else {
+                authTitle.innerText = "Login";
+                authForm.style.display = "block";
+                registerForm.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
